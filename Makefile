@@ -2,7 +2,7 @@
 
 CC = gcc
 CFLAGS = -Wall -Wextra -O3
-LDFLAGS = -Wall -lm -I$(DINC)
+LDFLAGS = -Wall -I$(DINC)
 
 # Directories
 

@@ -1,6 +1,20 @@
 #include "../inc/huff.h"
 
 
+void help(){
+    printf(
+    "\n\tHUFFMAN CODE \x1b[0m\n\n\
+    This code allows you to compress and to decompress a text file by using the famous huffman code.\n\
+    By default, without option, the program will compress and decompress your file.\n\n\n\
+    \t\x1b[1mUSAGE\x1b[0m\n\n\
+    ./EXECUTABLE [OPTION] [FILE]\n\n\
+    \t\x1b[1mLISTING OPTIONS\x1b[0m\n\n\
+    \t-c\tCompress the text file.\n\
+    \t-d\tDecompress the compressed file.\n\
+    \t-h\tOutputs this help message.\n\
+    \t--help\tSame as '-h'\n\n");
+}
+
 Data* insertionSort(Data *array){
     Data tmp = {0, 0};
     for (int i = 1, test = 0, j; i < CHAR_MAX; i++){
