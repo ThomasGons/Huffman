@@ -9,17 +9,17 @@ int main(int argc, char **argv){
     uint8_t opt;
     for (opt = 1; opt < argc - 1; opt++){
         if (!strcmp(argv[opt], "-c"))
-            compression(argv[argc]);
+            compression(argv[argc - 1]);
         else if (!strcmp(argv[opt], "-d"))
-            decompression(argv[argc]);
+            decompression(argv[argc - 1]);
         else if (!strcmp(argv[opt], "-h") || !strcmp(argv[opt], "--help"))
             help();
         else
             printf("Bad option.\nTry './bin/exe -h <file>' or './bin/exe --help <file>' for more information.\n");
     }
     if (opt == 1){  // just file name
-        compression(argv[argc]);
-        decompression(concat(argv[argc], ".hff"));
+        compression(argv[argc - 1]);
+        decompression(concat(argv[argc - 1], ".hfm"));
     }
     return EXIT_SUCCESS;
 }
@@ -33,12 +33,12 @@ char* concat(char* a, char* b){
     return tmp;   
 }
 
-
 void compression(char* file){
     /*
     Burrows-Wheeler => Move to front => Huffman
     */
     PtrQ charFile = findCharFile(file);
+    HTree huffTree = buildHuffmanTree(charFile);
 }
 
 void decompression(char* file){
@@ -74,16 +74,23 @@ HTree buildHuffmanTree(PtrQ allChar){
         return allChar->pTree;
     allChar = dequeue(allChar); allChar = dequeue(allChar);
     while (allChar){
-        if (allChar->next && allChar->pTree->occur + allChar->next->pTree->occur < subT->pTree->occur){
+        if (subT->next && subT->pTree->occur + subT->next->pTree->occur <= subT->pTree->occur + allChar->pTree->occur){
+            subT = enqueue(subT, createSubHTree(subT->pTree, subT->next->pTree));
+            subT = dequeue(subT); subT = dequeue(subT);
+        }
+        else if (allChar->next && allChar->pTree->occur + allChar->next->pTree->occur <= allChar->pTree->occur + subT->pTree->occur){
             subT = enqueue(subT, createSubHTree(allChar->pTree, allChar->next->pTree));
+            allChar = dequeue(allChar); allChar = dequeue(allChar);
+        }
+        else{
+            subT = enqueue(subT, createSubHTree(subT->pTree, allChar->pTree));
             allChar = dequeue(allChar);
         }
-        else
-            enqueue(subT, createSubHTree(subT->pTree, allChar->pTree));
-        allChar = dequeue(allChar);
     }
-    while (subT->next)
-        subT = enqueue(subT, createSubHTree(subT->pTree, subT->next->pTree));   
+    while (subT->next){
+        subT = enqueue(subT, createSubHTree(subT->pTree, subT->next->pTree));
+        subT = dequeue(subT); subT = dequeue(subT);
+    }
     return subT->pTree;
 }
 /*

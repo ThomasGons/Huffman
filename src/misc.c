@@ -19,7 +19,7 @@ Data* insertionSort(Data *array){
     for (int i = 1, test = 0, j; i < CHAR_MAX; i++){
         test++;
         j = i;
-        while (j > 0 && array[j - 1].occur < array[j].occur){
+        while (j > 0 && array[j - 1].occur > array[j].occur){
             test++;
             tmp = array[j];
             array[j] = array[j - 1];
@@ -36,17 +36,18 @@ PtrQ enqueue(PtrQ ptr, HTree t){
         printf("The node couldn't be created, allocation failed");
         exit(-3);
     }
-    *elm = (Queue) {.pTree = t, .next = ptr};
-    return elm;
+    *elm = (Queue) {.pTree = t, .next = NULL};
+    if (!ptr) return elm;
+    PtrQ tmp = ptr;
+    while (tmp->next)
+        tmp = tmp->next;
+    tmp->next = elm;
+    return ptr;
 }
 
 PtrQ dequeue(PtrQ ptr){
-    if (!ptr || !ptr->next) return NULL;
-    PtrQ tmp = ptr, tmpB = NULL;
-    while(tmp->next->next)
-        tmp = tmp->next;
-    tmpB = tmp->next;
-    tmp->next = NULL;
-    free(tmpB);
-    return ptr; 
+    PtrQ tmp = ptr->next;
+    ptr->next = NULL;
+    free(ptr);
+    return tmp; 
 }

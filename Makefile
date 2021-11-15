@@ -1,7 +1,7 @@
 # Compiler, linker and flags
 
 CC = gcc
-CFLAGS = -Wall -Wextra -O3
+CFLAGS = -g -Wall -Wextra -O3
 LDFLAGS = -Wall -I$(DINC)
 
 # Directories
