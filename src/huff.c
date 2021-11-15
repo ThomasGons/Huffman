@@ -1,33 +1,50 @@
 #include "../inc/huff.h"
 
 int main(int argc, char **argv){
-    options(argc, argv);
+    if (argc == 1){
+        fprintf(stderr, "A file is needed to start the execution.\
+        \nTry './bin/exe -h <file>' or './bin/exe --help <file>' for more information.\n");
+        exit(-1);
+    }
+    uint8_t opt;
+    for (opt = 1; opt < argc - 1; opt++){
+        if (!strcmp(argv[opt], "-c"))
+            compression(argv[argc]);
+        else if (!strcmp(argv[opt], "-d"))
+            decompression(argv[argc]);
+        else if (!strcmp(argv[opt], "-h") || !strcmp(argv[opt], "--help"))
+            help();
+        else
+            printf("Bad option.\nTry './bin/exe -h <file>' or './bin/exe --help <file>' for more information.\n");
+    }
+    if (opt == 1){  // just file name
+        compression(argv[argc]);
+        decompression(concat(argv[argc], ".hff"));
+    }
     return EXIT_SUCCESS;
 }
 
-void options(int argc, char **argv){
-    if (argc == 1){
-        fprintf(stderr, "A file is needed to start the execution.\
-        \nTry './exe -h' or './exe --help' for more information.\n");
-        exit(-1);
-    }
-    for (uint8_t opt = 1; opt < argc - 1; opt++){
-        if (!strcmp(argv[opt], "-c"))
-            compression(argv[argc - 1]);
-        else if (!strcmp(argv[opt], "-d"))
-            decompression(argv[argc - 1]);
-        else if (!strcmp(argv[opt], "-h") || strcmp(argv[opt], "--help"))
-            help();
-        else
-            fprintf(stderr, "Bad option.\nTry './exe -h' or './exe --help' for more information.\n");
-    }
+char* concat(char* a, char* b){
+    char *tmp = malloc(sizeof *tmp *(strlen(a) + strlen(b))), *tmpB = tmp;
+    for (; *b != '\0'; (*a == '\0') ? b++ : a++, tmpB++)
+        *tmpB = *a;
+    for (; *b != '\0'; b++, tmpB++)
+        *tmpB = *b;
+    return tmp;   
 }
 
+
 void compression(char* file){
+    /*
+    Burrows-Wheeler => Move to front => Huffman
+    */
     PtrQ charFile = findCharFile(file);
 }
 
 void decompression(char* file){
+    /*
+    Huffman => Move to front =>Burrows-Wheeler
+    */
     ;
 }
 
@@ -48,9 +65,6 @@ PtrQ findCharFile(char* file){
 
     return occursNode;
 }
-
-
-
 
 HTree buildHuffmanTree(PtrQ allChar){
     PtrQ subT = NULL; 

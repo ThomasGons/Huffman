@@ -40,8 +40,7 @@ typedef struct Queue{
             /* PROTOTYPES */
 
 // huff.c
-void options(int, char**);
-void help();
+char* concat(char*, char*);
 void compression(char*);
 void decompression(char*);
 PtrQ findCharFile(char*);
@@ -50,6 +49,7 @@ Encoding* getCharEncoding(HTree, Encoding*);
 
 // misc.c
 
+void help();
 Data* insertionSort(Data*);
 PtrQ enqueue(PtrQ, HTree);
 PtrQ dequeue(PtrQ);
