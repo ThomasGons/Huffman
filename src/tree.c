@@ -17,7 +17,7 @@ HTree createTree(size_t n, char c){
 }
 
 HTree createSubHTree(HTree t_1, HTree t_2){
-    HTree sht = createTree(t_1->occur + t_2->occur, '0');  // perhaps a bad idea
+    HTree sht = createTree(t_1->occur + t_2->occur, '\0');  // perhaps a bad idea
     if (t_1->occur > t_2->occur){
         sht->right = t_1; sht->left = t_2;
     }
@@ -30,10 +30,10 @@ HTree createSubHTree(HTree t_1, HTree t_2){
 
 void vDisplay(HTree pt, int dpt){
     if (pt){
-        printf("\x1b[38;2;%d;0;0m \u01c0", 255 - dpt * 13); // if the depth times DEPTHMAX does not exceed 255
+        printf("|");
         for (int i = 0; i < dpt; i++)
             printf("\u2014");
-        printf(" %ld: %c\n", pt->occur, pt->value); printf("\x1b[1m");
+        printf(" %ld: %c\n", pt->occur, pt->value);
         // preorder traversal
         vDisplay(pt->left, dpt + 1);
         vDisplay(pt->right, dpt + 1);

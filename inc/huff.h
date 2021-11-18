@@ -53,6 +53,8 @@ void help();
 Data* insertionSort(Data*);
 PtrQ enqueue(PtrQ, HTree);
 PtrQ dequeue(PtrQ);
+void Tree_Process_Data(HTree, int);
+void DFS_Preorder(HTree, int);
 
 // tree.c
 

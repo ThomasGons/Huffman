@@ -46,8 +46,28 @@ PtrQ enqueue(PtrQ ptr, HTree t){
 }
 
 PtrQ dequeue(PtrQ ptr){
+    if (!ptr || !ptr->next) return NULL;
     PtrQ tmp = ptr->next;
     ptr->next = NULL;
     free(ptr);
     return tmp; 
+}
+
+
+//Process data
+void Tree_Process_Data(HTree tree, int level)
+{
+    for (int i = 0; i < level; i++)
+        printf(i == level-1 ? "└──" : "   "); //|\u2014\u2014
+    printf("%ld: %c\n", tree->occur, tree->value);
+}
+
+//Preorder depth-first search (DFS) and process data.
+void DFS_Preorder(HTree root, int level)
+{
+    if (root) {
+        Tree_Process_Data(root, level);
+        DFS_Preorder(root->left, level+1);
+        DFS_Preorder(root->right, level+1);
+    }
 }

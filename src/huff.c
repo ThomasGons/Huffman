@@ -39,6 +39,7 @@ void compression(char* file){
     */
     PtrQ charFile = findCharFile(file);
     HTree huffTree = buildHuffmanTree(charFile);
+    vDisplay(huffTree, 0);
 }
 
 void decompression(char* file){
@@ -67,24 +68,23 @@ PtrQ findCharFile(char* file){
 }
 
 HTree buildHuffmanTree(PtrQ allChar){
-    PtrQ subT = NULL; 
-    if (allChar->next)
-        subT = enqueue(subT, createSubHTree(allChar->pTree, allChar->next->pTree));
-    else
+    if (!allChar->next)
         return allChar->pTree;
+    PtrQ subT = NULL;
+    subT= enqueue(subT, createSubHTree(allChar->pTree, allChar->next->pTree));
     allChar = dequeue(allChar); allChar = dequeue(allChar);
     while (allChar){
-        if (subT->next && subT->pTree->occur + subT->next->pTree->occur <= subT->pTree->occur + allChar->pTree->occur){
+        if (subT->next && subT->pTree->occur <= allChar->pTree->occur && subT->next->pTree->occur <= allChar->pTree->occur){
             subT = enqueue(subT, createSubHTree(subT->pTree, subT->next->pTree));
             subT = dequeue(subT); subT = dequeue(subT);
         }
-        else if (allChar->next && allChar->pTree->occur + allChar->next->pTree->occur <= allChar->pTree->occur + subT->pTree->occur){
+        else if (allChar->next && allChar->pTree->occur <= subT->pTree->occur && allChar->next->pTree->occur <= allChar->pTree->occur){
             subT = enqueue(subT, createSubHTree(allChar->pTree, allChar->next->pTree));
             allChar = dequeue(allChar); allChar = dequeue(allChar);
         }
         else{
             subT = enqueue(subT, createSubHTree(subT->pTree, allChar->pTree));
-            allChar = dequeue(allChar);
+            allChar = dequeue(allChar); subT = dequeue(subT);
         }
     }
     while (subT->next){

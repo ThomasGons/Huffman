@@ -1,3 +1,7 @@
+# ___MAKEFILE___
+
+# You can run make help to get more information about targets
+
 # Compiler, linker and flags
 
 CC = gcc
