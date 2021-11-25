@@ -1,6 +1,5 @@
 #include "../inc/huff.h"
 
-
 void help(){
     printf("\n\t\t\t\x1b[1mHUFFMAN CODE \x1b[0m\n\n\n\
     This code allows you to compress and to decompress a text file by using the famous huffman code.\n\
@@ -51,23 +50,4 @@ PtrQ dequeue(PtrQ ptr){
     ptr->next = NULL;
     free(ptr);
     return tmp; 
-}
-
-
-//Process data
-void Tree_Process_Data(HTree tree, int level)
-{
-    for (int i = 0; i < level; i++)
-        printf(i == level-1 ? "└──" : "   "); //|\u2014\u2014
-    printf("%ld: %c\n", tree->occur, tree->value);
-}
-
-//Preorder depth-first search (DFS) and process data.
-void DFS_Preorder(HTree root, int level)
-{
-    if (root) {
-        Tree_Process_Data(root, level);
-        DFS_Preorder(root->left, level+1);
-        DFS_Preorder(root->right, level+1);
-    }
 }

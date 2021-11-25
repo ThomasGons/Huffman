@@ -39,7 +39,6 @@ void compression(char* file){
     */
     PtrQ charFile = findCharFile(file);
     HTree huffTree = buildHuffmanTree(charFile);
-    vDisplay(huffTree, 0);
 }
 
 void decompression(char* file){

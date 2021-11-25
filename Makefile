@@ -1,11 +1,11 @@
 # ___MAKEFILE___
 
-# You can run make help to get more information about targets
+# You can run "make help" to get more information about targets
 
 # Compiler, linker and flags
 
 CC = gcc
-CFLAGS = -g -Wall -Wextra -O3
+CFLAGS = -g -Wall -Wextra -O3 
 LDFLAGS = -Wall -I$(DINC)
 
 # Directories
@@ -41,7 +41,7 @@ clean:
 	@rm -rf $(DOBJ) $(DBIN)
 	@echo "Clean up project directories"
 
-cleanSoft:
+cleanS:
 	@rm -f $(OBJ) $(EXE)
 	@echo "Objects and executable removed"
 
@@ -52,4 +52,4 @@ help:
 	@echo -e "\t\tmake [RULE]\n"
 	@echo -e "\t\x1b[1mLIST OF RULES\n" 
 	@echo -e "\t\t\x1b[1mclean\x1b[0m\t\tremove object and binary directories with their content." 
-	@echo -e "\t\t\x1b[1mcleanSoft\x1b[0m\tonly remove content of objects and binary directories.\n"
+	@echo -e "\t\t\x1b[1mcleanS\x1b[0m\tonly remove content of objects and binary directories.\n"

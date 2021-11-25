@@ -8,7 +8,7 @@
 
             /* CONSTANTS AND MACROS */
 
-#define CHAR_MAX 128
+#define CHAR_MAX 256
 
             /* STRUCTURES */ 
 
@@ -17,17 +17,17 @@ typedef enum bool{
 }bool;
 typedef struct Data{
     size_t occur;
-    char value;
+    unsigned char value;
 }Data;
 
 typedef struct Encoding{
     int binaryC, lengthBc; 
-    char value;
+    unsigned char value;
 }Encoding;
 
 typedef struct Tree{
     size_t occur;
-    char value;
+    unsigned char value;
     struct Tree *left, *right;
 }Tree, *HTree;
 
@@ -48,16 +48,12 @@ HTree buildHuffmanTree(PtrQ);
 Encoding* getCharEncoding(HTree, Encoding*);
 
 // misc.c
-
 void help();
 Data* insertionSort(Data*);
 PtrQ enqueue(PtrQ, HTree);
 PtrQ dequeue(PtrQ);
-void Tree_Process_Data(HTree, int);
-void DFS_Preorder(HTree, int);
 
 // tree.c
-
 int leavesTree(HTree);
 HTree createTree(size_t, char);
 HTree createSubHTree(HTree, HTree);
