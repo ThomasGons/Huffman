@@ -1,9 +1,7 @@
-# Huffman
+# Huffman Coding
 
-Who have not dreamt to compress files. <br/>
-Perhaps whole people but with this project you can do this. <br/>
-Using [Huffman Coding](https://brilliant.org/wiki/huffman-encoding/) onto ASCII text files,
-the result will take 20 to 90 % less memory.
+This project is an implementation of the [Huffman Coding](https://brilliant.org/wiki/huffman-encoding/).
+It allows you to lossless compress ASCII text files, until 20 to 90 percents.
 
 ## Table of Contents
 
@@ -31,10 +29,10 @@ git clone git@github.com:Tucobad/Huffman.git  # with ssh protocol
 
 
 The structure of the project is convenient, thus you can easily find your way. </br>
-By default, the sample files are in `config/` directory
+By default, there are some samples in `config/` directory (50kb to 2mb).
 
-The building of the project is done with `make` and all useful extensions </br>
-are described in the manual reachable with `make help`.
+The building of the project is done with `make` and useful extensions </br>
+to build the project are described in the manual reachable with `make help`.
 
 Once executable is created, you can use several options like compress and/or decompress </br>
 and ASCII text file. All of these options are in the execution's manual. </br>
