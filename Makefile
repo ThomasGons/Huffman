@@ -4,9 +4,9 @@
 
 # Compiler, linker and flags
 
-CC = gcc
-CFLAGS = -g -Wall -Wextra -O3 
-LDFLAGS = -Wall -I$(DINC)
+CC = gcc -fsanitize=address
+CFLAGS = -g -Wall -Wextra -O3
+LDFLAGS = -Wall -I$(DINC) -lm
 
 # Directories
 

@@ -18,12 +18,11 @@ typedef enum bool{
 typedef struct Data{
     size_t occur;
     unsigned char value;
+    unsigned encoding;
+    uint8_t size_encoding;
+
 }Data;
 
-typedef struct Encoding{
-    int binaryC, lengthBc; 
-    unsigned char value;
-}Encoding;
 
 typedef struct Tree{
     size_t occur;
@@ -43,9 +42,10 @@ typedef struct Queue{
 char* concat(char*, char*);
 void compression(char*);
 void decompression(char*);
-PtrQ findCharFile(char*);
+PtrQ findCharFile(char*, Data*);
 HTree buildHuffmanTree(PtrQ);
-Encoding* getCharEncoding(HTree, Encoding*);
+void getCharEncoding(HTree, Data*, unsigned, uint8_t);
+void makeCompressFile(Data*, char*);
 
 // misc.c
 void help();

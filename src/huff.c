@@ -37,8 +37,11 @@ void compression(char* file){
     /*
     Burrows-Wheeler => Move to front => Huffman
     */
-    PtrQ charFile = findCharFile(file);
+    Data allChar[CHAR_MAX] = {0, 0, 0, 0};
+    PtrQ charFile = findCharFile(file, allChar);
     HTree huffTree = buildHuffmanTree(charFile);
+    getCharEncoding(huffTree, allChar, 0, 0);
+    makeCompressFile(allChar, file);
 }
 
 void decompression(char* file){
@@ -49,16 +52,15 @@ void decompression(char* file){
 }
 
 
-PtrQ findCharFile(char* file){
-    Data allChar[CHAR_MAX] = {{0}, {0}};
+PtrQ findCharFile(char* file, Data* dict){
     for (int i = 0; i < CHAR_MAX; i++)
-        allChar[i].value = (char) i;
+        dict[i].value = (char) i;
     int8_t c;
     FILE *f = fopen(file, "r");
     while ((c = getc(f)) != EOF)
-        allChar[c].occur++;
+        dict[c].occur++;
     fclose(f);
-    Data* tmp = insertionSort(allChar);
+    Data* tmp = insertionSort(dict);
     PtrQ occursNode = NULL;
     for (int i = 0; i < CHAR_MAX; i++, tmp++)
         if (tmp->occur) occursNode = enqueue(occursNode, createTree(tmp->occur, tmp->value));
@@ -92,9 +94,23 @@ HTree buildHuffmanTree(PtrQ allChar){
     }
     return subT->pTree;
 }
-/*
-Encoding* getCharEncoding(HTree allChar, Encoding* allCharE){
-     DFS    recursive    left (0) : int code << 1    right (1) : (int code << 1)+1
-    ;
+
+
+void getCharEncoding(HTree pt, Data* dict, unsigned encode, uint8_t size){
+    if(pt){
+        if(pt->value!='\0'){
+            dict[(int) pt->value].encoding = encode; dict[(int) pt->value].size_encoding = size;
+        }
+        getCharEncoding(pt->left, dict, encode << 1, size++);
+        getCharEncoding(pt->right, dict, (encode << 1) | 1, size++);
+    };
 }
-*/
+
+void makeCompressFile(Data* dict, char* file){
+    int8_t c = 0;
+    FILE *f = fopen(file,"r+"), *hf = fopen(strcat(file, ".huf"), "wb");
+    while((c = getc(f)) != EOF)
+        fwrite(dict[(int) c].encoding, 1, sizeof dict[(int) c].encoding, hf);
+    fclose(f);
+    fclose(hf);
+}
