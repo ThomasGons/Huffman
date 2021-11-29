@@ -13,41 +13,32 @@ void help(){
     \t\x1b[1m--help\x1b[0m\tSame as '-h'\n\n");
 }
 
-Data* insertionSort(Data *array){
-    Data tmp = {0, 0};
-    for (int i = 1, test = 0, j; i < CHAR_MAX; i++){
-        test++;
-        j = i;
-        while (j > 0 && array[j - 1].occur > array[j].occur){
-            test++;
-            tmp = array[j];
-            array[j] = array[j - 1];
-            array[j - 1] = tmp;
-            j--;
-        }
-    }
-    return array;
-}
-
-PtrQ enqueue(PtrQ ptr, HTree t){
-    PtrQ elm = malloc(sizeof * elm);
+PriorityQueue push(PriorityQueue ptr, Tree pt){
+    PriorityQueue elm = malloc(sizeof * elm);
     if (!elm){ 
         printf("The node couldn't be created, allocation failed");
-        exit(-3);
+        exit(QUEUE_ALLOCATION_FAILED);
     }
-    *elm = (Queue) {.pTree = t, .next = NULL};
+    *elm = (PriorityQueueElm) {.pt = pt, .next = NULL};
     if (!ptr) return elm;
-    PtrQ tmp = ptr;
-    while (tmp->next)
+    PriorityQueue tmp = ptr;
+    while (tmp->next && tmp->next->pt->occur < pt->occur)
         tmp = tmp->next;
-    tmp->next = elm;
+    if (!tmp->next)
+        tmp->next = elm;
+    else{
+        PriorityQueue tmpB = tmp->next;
+        tmp->next = elm;
+        elm->next = tmpB;
+    }
     return ptr;
 }
 
-PtrQ dequeue(PtrQ ptr){
+PriorityQueue pull(PriorityQueue ptr){
     if (!ptr || !ptr->next) return NULL;
-    PtrQ tmp = ptr->next;
+    PriorityQueue tmp = ptr->next;
     ptr->next = NULL;
+    freeTree(ptr->pt);
     free(ptr);
     return tmp; 
 }

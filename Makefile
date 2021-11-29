@@ -4,7 +4,7 @@
 
 # Compiler, linker and flags
 
-CC = gcc -fsanitize=address
+CC = gcc
 CFLAGS = -g -Wall -Wextra -O3
 LDFLAGS = -Wall -I$(DINC) -lm
 
@@ -12,6 +12,7 @@ LDFLAGS = -Wall -I$(DINC) -lm
 
 DSRC = src/
 DINC = inc/
+DCONFIG = config/
 DOBJ = obj/
 DBIN = bin/
 
@@ -35,7 +36,11 @@ $(DOBJ)%.o: $(DSRC)%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 	@echo "Successful compilation !"
 
-.PHONY: clean cleanSoft
+.PHONY: clean cleanS cleanC
+
+cleanC:
+	@rm -f $(DCONFIG)*.huf
+	@echo "Compressed files removed."
 
 clean:
 	@rm -rf $(DOBJ) $(DBIN)
@@ -50,6 +55,7 @@ help:
 	@echo -e "\tFew explanations of target rules with make command.\n\tBy default, without rule, make will build the project.\n"
 	@echo -e "\t\x1b[1mUSAGE\x1b[0m"
 	@echo -e "\t\tmake [RULE]\n"
-	@echo -e "\t\x1b[1mLIST OF RULES\n" 
-	@echo -e "\t\t\x1b[1mclean\x1b[0m\t\tremove object and binary directories with their content." 
+	@echo -e "\t\x1b[1mLIST OF RULES\n"	
+	@echo -e "\t\t\x1b[1mcleanC\x1b[0m\tremove all compressed files."
+	@echo -e "\t\t\x1b[1mclean\x1b[0m\tremove object and binary directories with their content." 
 	@echo -e "\t\t\x1b[1mcleanS\x1b[0m\tonly remove content of objects and binary directories.\n"

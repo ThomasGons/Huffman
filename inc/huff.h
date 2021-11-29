@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <string.h>
 #include <inttypes.h>
 
@@ -10,30 +11,33 @@
 
 #define CHAR_MAX 256
 
+#define BAD_ARGUMENTS -1
+#define TREE_ALLOCATION_FAILED -2 
+#define QUEUE_ALLOCATION_FAILED -3
+
             /* STRUCTURES */ 
 
 typedef enum bool{
     false, true
 }bool;
+
 typedef struct Data{
     size_t occur;
     unsigned char value;
     unsigned encoding;
     uint8_t size_encoding;
-
 }Data;
 
-
-typedef struct Tree{
+typedef struct TreeElm{
     size_t occur;
     unsigned char value;
-    struct Tree *left, *right;
-}Tree, *HTree;
+    struct TreeElm *left, *right;
+}TreeElm, *Tree;
 
-typedef struct Queue{
-    HTree pTree;
-    struct Queue *next;
-}Queue, *PtrQ;
+typedef struct PriorityQueueElm{
+    Tree pt;
+    struct PriorityQueueElm *next;
+}PriorityQueueElm, *PriorityQueue;
 
 
             /* PROTOTYPES */
@@ -42,21 +46,24 @@ typedef struct Queue{
 char* concat(char*, char*);
 void compression(char*);
 void decompression(char*);
-PtrQ findCharFile(char*, Data*);
-HTree buildHuffmanTree(PtrQ);
-void getCharEncoding(HTree, Data*, unsigned, uint8_t);
+PriorityQueue findCharFile(char*, Data*);
+Tree buildHuffmanTree(PriorityQueue);
+void getCharEncoding(Tree, Data*, unsigned, uint8_t);
 void makeCompressFile(Data*, char*);
 
 // misc.c
 void help();
 Data* insertionSort(Data*);
-PtrQ enqueue(PtrQ, HTree);
-PtrQ dequeue(PtrQ);
+PriorityQueue push(PriorityQueue, Tree);
+PriorityQueue pull(PriorityQueue);
+
 
 // tree.c
-int leavesTree(HTree);
-HTree createTree(size_t, char);
-HTree createSubHTree(HTree, HTree);
-void vDisplay(HTree, int);
+int leavesTree(Tree);
+Tree createTree(size_t, char);
+Tree createOverTree(Tree, Tree);
+void freeTree(Tree);
+void vDisplay(Tree, int);
+
 
 #endif

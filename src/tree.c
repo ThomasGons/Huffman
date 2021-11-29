@@ -1,34 +1,43 @@
 #include "../inc/huff.h"
 
-int leavesTree(HTree pt){
+int leavesTree(Tree pt){
     if (!pt->left && !pt->right) return 1;
     else return 0;
     return leavesTree(pt->left) + leavesTree(pt->right);
 }
 
-HTree createTree(size_t n, char c){
-    HTree new = malloc(sizeof *new);
+Tree createTree(size_t n, char c){
+    Tree new = malloc(sizeof *new);
     if (!new){
         printf("The tree couldn't be created, allocation failed");
-        exit(-2);
+        exit(TREE_ALLOCATION_FAILED);
     }
-    *new = (Tree) {.occur = n, .value = c, .left = NULL, .right = NULL};
+    *new = (TreeElm) {.occur = n, .value = c, .left = NULL, .right = NULL};
     return new;
 }
 
-HTree createSubHTree(HTree t_1, HTree t_2){
-    HTree sht = createTree(t_1->occur + t_2->occur, '\0');  // perhaps a bad idea
-    if (t_1->occur > t_2->occur){
-        sht->right = t_1; sht->left = t_2;
+Tree createOverTree(Tree pt1, Tree pt2){
+    Tree sht = createTree(pt1->occur + pt2->occur, '\0');  // perhaps a bad idea
+    if (pt1->occur > pt2->occur){
+        sht->right = pt1; sht->left = pt2;
     }
     else{
-        sht->right = t_2; sht->left = t_1;
+        sht->right = pt2; sht->left = pt1;
     }
     return sht; 
 }
 
+void freeTree(Tree pt){
+    if (!pt){
+        if (!pt->left && !pt->right)
+        freeTree(pt->left);
+        freeTree(pt->right);
+        free(pt);
+        pt = NULL;
+    }
+}
 
-void vDisplay(HTree pt, int dpt){
+void vDisplay(Tree pt, int dpt){
     if (pt){
         printf("|");
         for (int i = 0; i < dpt; i++)

@@ -4,14 +4,14 @@ int main(int argc, char **argv){
     if (argc == 1){
         fprintf(stderr, "A file is needed to start the execution.\
         \nTry './bin/exe -h <file>' or './bin/exe --help <file>' for more information.\n");
-        exit(-1);
+        exit(BAD_ARGUMENTS);
     }
     uint8_t opt;
     for (opt = 1; opt < argc - 1; opt++){
         if (!strcmp(argv[opt], "-c"))
             compression(argv[argc - 1]);
         else if (!strcmp(argv[opt], "-d"))
-            decompression(argv[argc - 1]);
+            ;//decompression(argv[argc - 1]);
         else if (!strcmp(argv[opt], "-h") || !strcmp(argv[opt], "--help"))
             help();
         else
@@ -19,13 +19,13 @@ int main(int argc, char **argv){
     }
     if (opt == 1){  // just file name
         compression(argv[argc - 1]);
-        decompression(concat(argv[argc - 1], ".hfm"));
+        //decompression(concat(argv[argc - 1], ".hfm"));
     }
     return EXIT_SUCCESS;
 }
 
 char* concat(char* a, char* b){
-    char *tmp = malloc(sizeof *tmp *(strlen(a) + strlen(b))), *tmpB = tmp;
+    char *tmp = malloc(sizeof *tmp *(sizeof *a + sizeof *b)), *tmpB = tmp;
     for (; *b != '\0'; (*a == '\0') ? b++ : a++, tmpB++)
         *tmpB = *a;
     for (; *b != '\0'; b++, tmpB++)
@@ -34,25 +34,17 @@ char* concat(char* a, char* b){
 }
 
 void compression(char* file){
-    /*
-    Burrows-Wheeler => Move to front => Huffman
-    */
-    Data allChar[CHAR_MAX] = {0, 0, 0, 0};
-    PtrQ charFile = findCharFile(file, allChar);
-    HTree huffTree = buildHuffmanTree(charFile);
-    getCharEncoding(huffTree, allChar, 0, 0);
-    makeCompressFile(allChar, file);
+    clock_t begin = clock();
+    Data dict[CHAR_MAX] = {{0}, {0}, {0}, {0}};
+    Tree huffTree = buildHuffmanTree(findCharFile(file, dict));
+    getCharEncoding(huffTree, dict, 0, 0);
+    freeTree(huffTree);
+    makeCompressFile(dict, file);
+	clock_t end = clock();
+    printf("\nDuration : %ld ms\n", (end - begin) * 1000 / CLOCKS_PER_SEC);
 }
 
-void decompression(char* file){
-    /*
-    Huffman => Move to front =>Burrows-Wheeler
-    */
-    ;
-}
-
-
-PtrQ findCharFile(char* file, Data* dict){
+PriorityQueue findCharFile(char* file, Data* dict){
     for (int i = 0; i < CHAR_MAX; i++)
         dict[i].value = (char) i;
     int8_t c;
@@ -60,57 +52,60 @@ PtrQ findCharFile(char* file, Data* dict){
     while ((c = getc(f)) != EOF)
         dict[c].occur++;
     fclose(f);
-    Data* tmp = insertionSort(dict);
-    PtrQ occursNode = NULL;
-    for (int i = 0; i < CHAR_MAX; i++, tmp++)
-        if (tmp->occur) occursNode = enqueue(occursNode, createTree(tmp->occur, tmp->value));
-
-    return occursNode;
+    PriorityQueue dictQueue = NULL;
+    for (int i = 0; i < CHAR_MAX; i++, dict++){
+        if (dict->occur)
+            dictQueue = push(dictQueue, createTree(dict->occur, dict->value));
+    }
+    return dictQueue;
 }
 
-HTree buildHuffmanTree(PtrQ allChar){
-    if (!allChar->next)
-        return allChar->pTree;
-    PtrQ subT = NULL;
-    subT= enqueue(subT, createSubHTree(allChar->pTree, allChar->next->pTree));
-    allChar = dequeue(allChar); allChar = dequeue(allChar);
-    while (allChar){
-        if (subT->next && subT->pTree->occur <= allChar->pTree->occur && subT->next->pTree->occur <= allChar->pTree->occur){
-            subT = enqueue(subT, createSubHTree(subT->pTree, subT->next->pTree));
-            subT = dequeue(subT); subT = dequeue(subT);
-        }
-        else if (allChar->next && allChar->pTree->occur <= subT->pTree->occur && allChar->next->pTree->occur <= allChar->pTree->occur){
-            subT = enqueue(subT, createSubHTree(allChar->pTree, allChar->next->pTree));
-            allChar = dequeue(allChar); allChar = dequeue(allChar);
-        }
-        else{
-            subT = enqueue(subT, createSubHTree(subT->pTree, allChar->pTree));
-            allChar = dequeue(allChar); subT = dequeue(subT);
-        }
+Tree buildHuffmanTree(PriorityQueue dict){
+    while (dict->next){
+        dict = push(dict, createOverTree(dict->pt, dict->next->pt));
+        dict = pull(dict); dict = pull(dict);
     }
-    while (subT->next){
-        subT = enqueue(subT, createSubHTree(subT->pTree, subT->next->pTree));
-        subT = dequeue(subT); subT = dequeue(subT);
-    }
-    return subT->pTree;
+    Tree tmp = dict->pt;
+    free(dict);
+    return tmp;
 }
 
 
-void getCharEncoding(HTree pt, Data* dict, unsigned encode, uint8_t size){
+void getCharEncoding(Tree pt, Data* dict, unsigned encode, uint8_t size){
     if(pt){
         if(pt->value!='\0'){
             dict[(int) pt->value].encoding = encode; dict[(int) pt->value].size_encoding = size;
         }
-        getCharEncoding(pt->left, dict, encode << 1, size++);
-        getCharEncoding(pt->right, dict, (encode << 1) | 1, size++);
+        getCharEncoding(pt->left, dict, encode << 1, size + 1);
+        getCharEncoding(pt->right, dict, (encode << 1) | 1, size + 1);
     };
 }
 
 void makeCompressFile(Data* dict, char* file){
-    int8_t c = 0;
+    int8_t c = 0, buff_size = 0;
+    unsigned buffer = 0, binary = 0;
+    float sizeO = 0, sizeC = 0;
     FILE *f = fopen(file,"r+"), *hf = fopen(strcat(file, ".huf"), "wb");
-    while((c = getc(f)) != EOF)
-        fwrite(dict[(int) c].encoding, 1, sizeof dict[(int) c].encoding, hf);
-    fclose(f);
-    fclose(hf);
+    for (short i = 0; i < CHAR_MAX; i++)
+        fprintf(hf, "%c|%u|%u|", dict[i].value, dict[i].encoding, dict[i].size_encoding);
+    while((c = getc(f)) != EOF){
+        sizeO += 8;
+        buffer <<= dict[c].size_encoding;
+        buffer |= dict[c].encoding;
+        buff_size += dict[c].size_encoding;
+        while(buff_size >= 8){
+            buff_size -= 8;
+            binary = buffer >> buff_size;
+            fwrite(&binary, 1, 1, hf);
+            sizeC += 8;
+        }
+    }
+    printf("Original size: %.f kb\nCompressed size: %.f kb\nEfficiency: %.2f %%", sizeO / (8 * 1000), sizeC / (8 * 1000), 100 - (100 * sizeC / sizeO));
+    fclose(f); fclose(hf);
 }
+/*
+void decompression(char* file){
+    Huffman => Move to front =>Burrows-Wheeler 
+    ;
+}
+*/
