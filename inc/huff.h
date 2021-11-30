@@ -43,7 +43,7 @@ typedef struct PriorityQueueElm{
             /* PROTOTYPES */
 
 // huff.c
-char* concat(char*, char*);
+char* removeExt(char*);
 void compression(char*);
 void decompression(char*);
 PriorityQueue findCharFile(char*, Data*);

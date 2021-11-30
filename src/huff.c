@@ -24,15 +24,6 @@ int main(int argc, char **argv){
     return EXIT_SUCCESS;
 }
 
-char* concat(char* a, char* b){
-    char *tmp = malloc(sizeof *tmp *(sizeof *a + sizeof *b)), *tmpB = tmp;
-    for (; *b != '\0'; (*a == '\0') ? b++ : a++, tmpB++)
-        *tmpB = *a;
-    for (; *b != '\0'; b++, tmpB++)
-        *tmpB = *b;
-    return tmp;   
-}
-
 void compression(char* file){
     clock_t begin = clock();
     Data dict[CHAR_MAX] = {{0}, {0}, {0}, {0}};
@@ -87,7 +78,7 @@ void makeCompressFile(Data* dict, char* file){
     float sizeO = 0, sizeC = 0;
     FILE *f = fopen(file,"r+"), *hf = fopen(strcat(file, ".huf"), "wb");
     for (short i = 0; i < CHAR_MAX; i++)
-        fprintf(hf, "%c|%u|%u|", dict[i].value, dict[i].encoding, dict[i].size_encoding);
+        dict[i].occur ? fprintf(hf, "%c|%u|%u|", dict[i].value, dict[i].encoding, dict[i].size_encoding): 0;
     while((c = getc(f)) != EOF){
         sizeO += 8;
         buffer <<= dict[c].size_encoding;
@@ -100,12 +91,11 @@ void makeCompressFile(Data* dict, char* file){
             sizeC += 8;
         }
     }
-    printf("Original size: %.f kb\nCompressed size: %.f kb\nEfficiency: %.2f %%", sizeO / (8 * 1000), sizeC / (8 * 1000), 100 - (100 * sizeC / sizeO));
+    if (buff_size){
+        buffer <<= (8 - buff_size);
+        binary = buffer >> 8;
+        fwrite(&binary, 1, 1, hf) ;
+    }
+    printf("Original size: %.f bits\nCompressed size: %.f bits\nEfficiency: %.2f %%", sizeO / 8, sizeC / 8, (100 * sizeC / sizeO));
     fclose(f); fclose(hf);
 }
-/*
-void decompression(char* file){
-    Huffman => Move to front =>Burrows-Wheeler 
-    ;
-}
-*/
