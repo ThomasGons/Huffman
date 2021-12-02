@@ -17,23 +17,21 @@ Tree createTree(size_t n, char c){
 }
 
 Tree createOverTree(Tree pt1, Tree pt2){
-    Tree sht = createTree(pt1->occur + pt2->occur, '\0');  // perhaps a bad idea
+    Tree overTree = createTree(pt1->occur + pt2->occur, '\0');  // perhaps a bad idea
     if (pt1->occur > pt2->occur){
-        sht->right = pt1; sht->left = pt2;
+        overTree->right = pt1; overTree->left = pt2;
     }
     else{
-        sht->right = pt2; sht->left = pt1;
+        overTree->right = pt2; overTree->left = pt1;
     }
-    return sht; 
+    return overTree; 
 }
 
 void freeTree(Tree pt){
-    if (!pt){
-        if (!pt->left && !pt->right)
+    if (pt){
         freeTree(pt->left);
-        freeTree(pt->right);
+        freeTree(pt->right); 
         free(pt);
-        pt = NULL;
     }
 }
 
