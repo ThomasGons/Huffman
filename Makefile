@@ -39,7 +39,7 @@ $(DOBJ)%.o: $(DSRC)%.c
 .PHONY: clean cleanS cleanC
 
 cleanC:
-	@rm -f $(DCONFIG)*.huf
+	@rm -f $(DCONFIG)*.huf $(DCONFIG)*.huf.dcm
 	@echo "Compressed files removed."
 
 clean:

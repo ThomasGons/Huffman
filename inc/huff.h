@@ -17,7 +17,7 @@
                        (Prefix) {(n) / 1000000000, "gb"} : \
                        (Prefix) {(n) / 1000000, "mb"} : \
                        (Prefix) {(n) / 1000, "kb"} : \
-                       (Prefix) {(n), "bits"} \
+                       (Prefix) {(n), "bits"}
 
 
 #define BAD_ARGUMENTS -1
@@ -57,20 +57,23 @@ typedef struct Prefix{
             /* PROTOTYPES */
 
 // huff.c
-char* removeExt(char*);
+char *removeExt(char*);
 void compression(char*);
 void decompression(char*);
 PriorityQueue findCharFile(char*, Data*, uint8_t*);
 Tree buildHuffmanTree(PriorityQueue);
 void getCharEncoding(Tree, Data*, unsigned, uint8_t);
 void makeCompressFile(Data*, char*, uint8_t*);
+void decoampression(char*);
+void getDictionary(FILE*, Data*, uint8_t);
+void makeDecompressFile(FILE*, Data*, char*, uint8_t);
 
 // misc.c
 void help();
-Data* insertionSort(Data*);
+Data *insertionSort(Data*);
 PriorityQueue push(PriorityQueue, Tree);
 PriorityQueue pull(PriorityQueue);
-char* unitPrefix(float*);
+char *unitPrefix(float*);
 
 // tree.c
 int leavesTree(Tree);

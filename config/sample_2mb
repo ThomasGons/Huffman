@@ -3962,63 +3962,7 @@ Sed tempus urna et pharetra. Viverra accumsan in nisl nisi. Felis bibendum ut tr
 
 Ornare massa eget egestas purus viverra accumsan. Pretium lectus quam id leo in. Quam nulla porttitor massa id neque aliquam vestibulum morbi blandit. Amet dictum sit amet justo donec enim diam. In metus vulputate eu scelerisque felis imperdiet proin fermentum leo. Eu nisl nunc mi ipsum faucibus vitae aliquet nec ullamcorper. Senectus et netus et malesuada fames ac turpis egestas maecenas. Sed velit dignissim sodales ut eu sem integer. Cras fermentum odio eu feugiat pretium. Gravida arcu ac tortor dignissim convallis aenean et. Turpis nunc eget lorem dolor sed viverra ipsum nunc aliquet. Vitae auctor eu augue ut lectus arcu bibendum. Senectus et netus et malesuada fames ac turpis egestas. Viverra accumsan in nisl nisi scelerisque. Purus sit amet luctus venenatis lectus magna fringilla. Turpis egestas pretium aenean pharetra magna ac placerat vestibulum lectus. Vestibulum mattis ullamcorper velit sed ullamcorper morbi tincidunt. Risus at ultrices mi tempus imperdiet nulla malesuada.
 
-Viverra tellus in hac habitasse platea dictumst vestibulum rhoncus. Ac auctor augue mauris augue neque gravida in fermentum. Eget gravida cum sociis natoque penatibus et magnis. Ultrices vitae auctor eu augue ut lectus arcu bibendum at. Metus vulputate eu scelerisque felis. Elementum nisi quis eleifend quam adipiscing vitae proin sagittis nisl. Eget mauris pharetra et ultrices. Elementum pulvinar etiam non quam lacus suspendisse faucibus interdum. Ut consequat semper viverra nam libero justo. In egestas erat imperdiet sed euismod nisi porta lorem mollis. Parturient montes nascetur ridiculus mus mauris vitae ultricies. Urna molestie at elementum eu. Pellentesque massa placerat duis ultricies lacus sed turpis tincidunt. Sollicitudin ac orci phasellus egestas tellus rutrum. Scelerisque felis imperdiet proin fermentum. Nibh sed pulvinar proin gravida hendrerit lectus. Dignissim suspendisse in est ante in nibh mauris cursus. Molestie ac feugiat sed lectus vestibulum mattis ullamcorper velit. Vel quam elementum pulvinar etiam non. Proin sed libero enim sed faucibus turpis in eu mi.
-static void
-print_hello (GtkWidget *widget,
-             gpointer   data)
-{
-  g_print ("Hello World\n");
-}
-
-static void
-quit_cb (GtkWindow *window)
-{
-  gtk_window_close (window);
-}
-
-static void
-activate (GtkApplication *app,
-          gpointer        user_data)
-{
-  /* Construct a GtkBuilder instance and load our UI description */
-  GtkBuilder *builder = gtk_builder_new ();
-  gtk_builder_add_from_file (builder, "src/builder.ui", NULL);
-
-  /* Connect signal handlers to the constructed widgets. */
-  GObject *window = gtk_builder_get_object (builder, "window");
-  gtk_window_set_application (GTK_WINDOW (window), app);
-
-  GObject *button = gtk_builder_get_object (builder, "button1");
-  g_signal_connect (button, "clicked", G_CALLBACK (print_hello), NULL);
-
-  button = gtk_builder_get_object (builder, "button2");
-  g_signal_connect (button, "clicked", G_CALLBACK (print_hello), NULL);
-
-  button = gtk_builder_get_object (builder, "quit");
-  g_signal_connect_swapped (button, "clicked", G_CALLBACK (quit_cb), window);
-
-  gtk_widget_show (GTK_WIDGET (window));
-
-  /* We do not need the builder any more */
-  g_object_unref (builder);
-}
-
-int
-main (int   argc,
-      char *argv[])
-{
-#ifdef GTK_SRCDIR
-  g_chdir (GTK_SRCDIR);
-#endif
-
-  GtkApplication *app = gtk_application_new ("org.gtk.example", G_APPLICATION_FLAGS_NONE);
-  g_signal_connect (app, "activate", G_CALLBACK (activate), NULL);
-
-  int status = g_application_run (G_APPLICATION (app), argc, argv);
-  g_object_unref (app);
-
-  return status;
-} faucibus purus in massa. Ullamcorper malesuada proin libero nunc. Feugiat pretium nibh ipsum consequat nisl vel pretium lectus quam. Condimentum id venenatis a condimentum vitae sapien pellentesque habitant morbi. Orci nulla pellentesque dignissim enim sit amet venenatis urna cursus. Augue neque gravida in fermentum et sollicitudin ac orci. Quisque id diam vel quam. Tincidunt eget nullam non nisi est sit. Viverra vitae congue eu consequat ac felis donec et. Urna duis convallis convallis tellus id interdum velit laoreet id. Habitant morbi tristique senectus et netus et malesuada fames. Integer vitae justo eget magna fermentum iaculis eu. Netus et malesuada fames ac turpis egestas.
+Viverra tellus in hac habitasse platea dictumst vestibulum rhoncus. Ac auctor augue mauris augue neque gravida in fermentum. Eget gravida cum sociis natoque penatibus et magnis. Ultrices vitae auctor eu augue ut lectus arcu bibendum at. Metus vulputate eu scelerisque felis. Elementum nisi quis eleifend quam adipiscing vitae proin sagittis nisl. Eget mauris pharetra et ultrices. Elementum pulvinar etiam non quam lacus suspendisse faucibus interdum. Ut consequat semper viverra nam libero justo. In egestas erat imperdiet sed euismod nisi porta lorem mollis. Parturient montes nascetur ridiculus mus mauris vitae ultricies. Urna molestie at elementum eu. Pellentesque massa placerat duis ultricies lacus sed turpis tincidunt. Sollicitudin ac orci phasellus egestas tellus rutrum. Scelerisque felis imperdiet proin fermentum. Nibh sed pulvinar proin gravida hendrerit lectus. Dignissim suspendisse in est ante in nibh mauris cursus. Molestie ac feugiat sed lectus vestibulum mattis ullamcorper velit. Vel quam elementum pulvinar etiam non. Proin sed libero enim sed faucibus turpis in eu mi. Ullamcorper malesuada proin libero nunc. Feugiat pretium nibh ipsum consequat nisl vel pretium lectus quam. Condimentum id venenatis a condimentum vitae sapien pellentesque habitant morbi. Orci nulla pellentesque dignissim enim sit amet venenatis urna cursus. Augue neque gravida in fermentum et sollicitudin ac orci. Quisque id diam vel quam. Tincidunt eget nullam non nisi est sit. Viverra vitae congue eu consequat ac felis donec et. Urna duis convallis convallis tellus id interdum velit laoreet id. Habitant morbi tristique senectus et netus et malesuada fames. Integer vitae justo eget magna fermentum iaculis eu. Netus et malesuada fames ac turpis egestas.
 
 Aliquam malesuada bibendum arcu vitae. Tellus molestie nunc non blandit massa enim. Donec ultrices tincidunt arcu non sodales. Facilisis leo vel fringilla est ullamcorper eget. Venenatis cras sed felis eget. Dictum sit amet justo donec enim. Facilisis gravida neque convallis a. Sed elementum tempus egestas sed sed risus. Nunc scelerisque viverra mauris in aliquam. Eget nullam non nisi est sit amet. Elementum nibh tellus molestie nunc non blandit. Cursus metus aliquam eleifend mi in nulla posuere sollicitudin. Leo vel orci porta non pulvinar. Semper viverra nam libero justo laoreet sit amet cursus.
 
