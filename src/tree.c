@@ -6,19 +6,19 @@ int leavesTree(Tree pt){
     return leavesTree(pt->left) + leavesTree(pt->right);
 }
 
-Tree createTree(size_t n, char c){
+Tree createTree(Data dict){
     Tree new = malloc(sizeof *new);
     if (!new){
         printf("The tree couldn't be created, allocation failed");
         exit(TREE_ALLOCATION_FAILED);
     }
-    *new = (TreeElm) {.occur = n, .value = c, .left = NULL, .right = NULL};
+    *new = (TreeElm) {.data = dict, .left = NULL, .right = NULL};
     return new;
 }
 
 Tree createOverTree(Tree pt1, Tree pt2){
-    Tree overTree = createTree(pt1->occur + pt2->occur, '\0');  // perhaps a bad idea
-    if (pt1->occur > pt2->occur){
+    Tree overTree = createTree(DATA_SUM(pt1->data, pt2->data));  // perhaps a bad idea
+    if (pt1->data.occur > pt2->data.occur){
         overTree->right = pt1; overTree->left = pt2;
     }
     else{
@@ -38,9 +38,9 @@ void freeTree(Tree pt){
 void vDisplay(Tree pt, int dpt){
     if (pt){
         printf("|");
-        for (int i = 0; i < dpt; i++)
+        for (uint8_t i = 0; i < dpt; i++)
             printf("\u2014");
-        printf(" %ld: %c\n", pt->occur, pt->value);
+        printf(" %ld: %c\n", pt->data.occur, pt->data.value);
         // preorder traversal
         vDisplay(pt->left, dpt + 1);
         vDisplay(pt->right, dpt + 1);

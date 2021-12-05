@@ -38,7 +38,7 @@ void compression(char *file){
 }
 
 PriorityQueue findCharFile(char *file, Data *dict, uint8_t *nb_char){
-    for (int i = 0; i < CHAR_MAX; i++)
+    for (uint16_t i = 0; i < CHAR_MAX; i++)
         dict[i].value = (char) i;
     int8_t c;
     FILE *f = fopen(file, "r");
@@ -48,7 +48,7 @@ PriorityQueue findCharFile(char *file, Data *dict, uint8_t *nb_char){
     PriorityQueue dictQueue = NULL;
     for (int i = 0; i < CHAR_MAX; i++, dict++){
         if (dict->occur){
-            dictQueue = push(dictQueue, createTree(dict->occur, dict->value));
+            dictQueue = push(dictQueue, createTree(*dict));
             (*nb_char)++;
         }
     }
@@ -67,8 +67,8 @@ Tree buildHuffmanTree(PriorityQueue ptrQ){
 
 void getCharEncoding(Tree pt, Data *dict, unsigned encode, uint8_t size){
     if(pt){
-        if(pt->value!='\0'){
-            dict[(int) pt->value].encoding = encode; dict[(int) pt->value].size_encoding = size;
+        if(pt->data.value != '\0'){
+            dict[(int) pt->data.value].encoding = encode; dict[(int) pt->data.value].size_encoding = size;
         }
         getCharEncoding(pt->left, dict, encode << 1, size + 1);
         getCharEncoding(pt->right, dict, (encode << 1) | 1, size + 1);
@@ -81,9 +81,10 @@ void makeCompressFile(Data *dict, char *file, uint8_t *nb_char){
     float sizeO = 0, sizeC = 0;
     FILE *f = fopen(file,"r+"), *cf = fopen(strcat(file, ".huf"), "wb");
     fwrite(nb_char, sizeof(uint8_t), 1, cf);
-    for (short i = 0; i < CHAR_MAX; i++){
+    for (uint16_t i = 0; i < CHAR_MAX; i++){
         if (dict[i].occur){
             fwrite(&dict[i].value, sizeof(char), 1, cf);
+            fwrite(&dict[i].occur, sizeof(size_t), 1, cf);
             fwrite(&dict[i].encoding, sizeof(unsigned), 1, cf);
             fwrite(&dict[i].size_encoding, sizeof(uint8_t), 1, cf);
         }
@@ -118,41 +119,47 @@ void decompression(char *file){
     fread(&size, sizeof(uint8_t), 1, f);
     Data dict[size];    
     getDictionary(f, dict, size);
-    makeDecompressFile(f, dict, file, size);
+    PriorityQueue dictQueue = NULL;
+    for (uint8_t i = 0; i < size; i++){
+        dictQueue = push(dictQueue, createTree(dict[i]));
+    }
+    Tree huffTree = buildHuffmanTree(dictQueue);
+    makeDecompressFile(f, huffTree, file);
+    freeTree(huffTree);
     fclose(f);
     clock_t end = clock();
-    printf("\nDecompression completed in %ld ms\n", (end - begin) * 1000 / CLOCKS_PER_SEC);
+    printf("Decompression completed in %ld ms\n", (end - begin) * 1000 / CLOCKS_PER_SEC);
 
 }
 
 void getDictionary(FILE *file, Data *dict, uint8_t size){
     for (uint8_t i = 0; i < size; i++){
         fread(&dict[i].value, sizeof(char), 1, file); 
+        fread(&dict[i].occur, sizeof(size_t), 1, file);
         fread(&dict[i].encoding, sizeof(unsigned), 1, file);
-        fread(&dict[i].size_encoding, sizeof(uint8_t), 1, file);
+        fread(&dict[i].size_encoding, sizeof(uint8_t), 1, file); 
     }
 }
 
-void makeDecompressFile(FILE *file, Data *dict, char *n_file, uint8_t size){
-    uint8_t buffer_size = 0, j;
-    int8_t i;
-    unsigned c, buffer = 0, tmp;
-    FILE *df = fopen(strcat(n_file, ".dcm"), "w");
-    while(fread(&c, sizeof(uint8_t), 1, file) == 1){
-        buffer <<= 8;
-        buffer |= c;
+void makeDecompressFile(FILE *file, Tree t, char *n_file){
+    FILE *df = fopen(strcat(n_file, ".dcm"), "w+");
+    uint8_t buffer_size = 0; int8_t i;
+    unsigned c, buffer = 0;
+    Tree tmp = t;
+    while (fread(&c, sizeof(uint8_t), 1, file) == 1){
+        buffer <<= 8; 
         buffer_size += 8;
+        buffer |= c;
         for (i = buffer_size - 1; i >= 0; i--){
-            tmp = buffer >> i;
-            for (j = 0; j < size; j++){
-                if (tmp == dict[j].encoding && (buffer_size - i) == dict[j].size_encoding){
-                    fprintf(df, "%c", dict[j].value);
-                    buffer_size = i;
-                    buffer &= (((1 << i)) - 1);
-                    break;
-                }
+            if (BIT_EXTRACTION(buffer, i)) tmp = tmp->right;
+            else tmp = tmp->left;
+            if (!tmp->right && !tmp->left){
+                fprintf(df, "%c", tmp->data.value);
+                buffer_size = i; 
+                tmp = t;
             }
         }
+        tmp = t;
     }
     fclose(df);
 }

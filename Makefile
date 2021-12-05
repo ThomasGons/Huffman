@@ -40,7 +40,7 @@ $(DOBJ)%.o: $(DSRC)%.c
 
 cleanC:
 	@rm -f $(DCONFIG)*.huf $(DCONFIG)*.huf.dcm
-	@echo "Compressed files removed."
+	@echo "Compressed and decompressed files removed."
 
 clean:
 	@rm -rf $(DOBJ) $(DBIN)

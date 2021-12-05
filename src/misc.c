@@ -22,7 +22,7 @@ PriorityQueue push(PriorityQueue ptr, Tree pt){
     *elm = (PriorityQueueElm) {.pt = pt, .next = NULL};
     if (!ptr) return elm;
     PriorityQueue tmp = ptr;
-    while (tmp->next && tmp->next->pt->occur < pt->occur)
+    while (tmp->next && tmp->next->pt->data.occur < pt->data.occur)
         tmp = tmp->next;
     
     PriorityQueue tmpB = tmp->next;

@@ -11,6 +11,9 @@
 
 #define CHAR_MAX 256
 
+#define DATA_SUM(a, b) (Data) {a.occur + b.occur, '0', 0, 0}
+#define BIT_EXTRACTION(n, p) (1 & ((n) >> (p)))
+
 #define UNIT_PREFIX(n) ((n) >= 1000) ? \
                        ((n) >= 1000000) ? \
                        ((n) >= 1000000000) ? \
@@ -38,8 +41,7 @@ typedef struct Data{
 }Data;
 
 typedef struct TreeElm{
-    size_t occur;
-    unsigned char value;
+    Data data;
     struct TreeElm *left, *right;
 }TreeElm, *Tree;
 
@@ -66,7 +68,7 @@ void getCharEncoding(Tree, Data*, unsigned, uint8_t);
 void makeCompressFile(Data*, char*, uint8_t*);
 void decoampression(char*);
 void getDictionary(FILE*, Data*, uint8_t);
-void makeDecompressFile(FILE*, Data*, char*, uint8_t);
+void makeDecompressFile(FILE*, Tree, char*);
 
 // misc.c
 void help();
@@ -77,7 +79,7 @@ char *unitPrefix(float*);
 
 // tree.c
 int leavesTree(Tree);
-Tree createTree(size_t, char);
+Tree createTree(Data);
 Tree createOverTree(Tree, Tree);
 void freeTree(Tree);
 void vDisplay(Tree, int);
