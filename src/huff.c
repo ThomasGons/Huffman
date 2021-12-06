@@ -40,8 +40,12 @@ void compression(char *file){
 PriorityQueue findCharFile(char *file, Data *dict, uint8_t *nb_char){
     for (uint16_t i = 0; i < CHAR_MAX; i++)
         dict[i].value = (char) i;
-    int8_t c;
+    short c;
     FILE *f = fopen(file, "r");
+    if (!f){
+        fprintf(stderr, "It seems that the file '%s' does not exist", file);
+        exit(FILE_DOES_NOT_EXIST);
+    }
     while ((c = getc(f)) != EOF)
         dict[c].occur++;
     fclose(f);
@@ -84,9 +88,7 @@ void makeCompressFile(Data *dict, char *file, uint8_t *nb_char){
     for (uint16_t i = 0; i < CHAR_MAX; i++){
         if (dict[i].occur){
             fwrite(&dict[i].value, sizeof(char), 1, cf);
-            fwrite(&dict[i].occur, sizeof(size_t), 1, cf);
-            fwrite(&dict[i].encoding, sizeof(unsigned), 1, cf);
-            fwrite(&dict[i].size_encoding, sizeof(uint8_t), 1, cf);
+            fwrite(&dict[i].occur, sizeof(unsigned), 1, cf);
         }
     }
     while((c = getc(f)) != EOF){
@@ -133,29 +135,28 @@ void decompression(char *file){
 }
 
 void getDictionary(FILE *file, Data *dict, uint8_t size){
-    for (uint8_t i = 0; i < size; i++){
+    for (uint8_t i = 0; i < size; i++){ 
         fread(&dict[i].value, sizeof(char), 1, file); 
-        fread(&dict[i].occur, sizeof(size_t), 1, file);
-        fread(&dict[i].encoding, sizeof(unsigned), 1, file);
-        fread(&dict[i].size_encoding, sizeof(uint8_t), 1, file); 
+        fread(&dict[i].occur, sizeof(unsigned), 1, file);
     }
 }
 
 void makeDecompressFile(FILE *file, Tree t, char *n_file){
     FILE *df = fopen(strcat(n_file, ".dcm"), "w+");
-    uint8_t buffer_size = 0; int8_t i;
-    unsigned c, buffer = 0;
+    uint8_t buffer_size = 0, c; int8_t i;
+    unsigned buffer = 0, nb_char = t->data.occur;
     Tree tmp = t;
     while (fread(&c, sizeof(uint8_t), 1, file) == 1){
         buffer <<= 8; 
         buffer_size += 8;
         buffer |= c;
-        for (i = buffer_size - 1; i >= 0; i--){
+        for (i = buffer_size - 1; i >= 0 && nb_char; i--){
             if (BIT_EXTRACTION(buffer, i)) tmp = tmp->right;
             else tmp = tmp->left;
             if (!tmp->right && !tmp->left){
                 fprintf(df, "%c", tmp->data.value);
                 buffer_size = i; 
+                nb_char--;
                 tmp = t;
             }
         }

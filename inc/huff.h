@@ -11,9 +11,8 @@
 
 #define CHAR_MAX 256
 
-#define DATA_SUM(a, b) (Data) {a.occur + b.occur, '0', 0, 0}
+#define DATA_SUM(a, b) (Data) {'0', a.occur + b.occur, 0, 0}
 #define BIT_EXTRACTION(n, p) (1 & ((n) >> (p)))
-
 #define UNIT_PREFIX(n) ((n) >= 1000) ? \
                        ((n) >= 1000000) ? \
                        ((n) >= 1000000000) ? \
@@ -24,8 +23,9 @@
 
 
 #define BAD_ARGUMENTS -1
-#define TREE_ALLOCATION_FAILED -2 
-#define QUEUE_ALLOCATION_FAILED -3
+#define FILE_DOES_NOT_EXIST -2
+#define TREE_ALLOCATION_FAILED -3
+#define QUEUE_ALLOCATION_FAILED -4
 
             /* STRUCTURES */ 
 
@@ -34,8 +34,8 @@ typedef enum bool{
 }bool;
 
 typedef struct Data{
-    size_t occur;
     unsigned char value;
+    unsigned occur;
     unsigned encoding;
     uint8_t size_encoding;
 }Data;
@@ -78,7 +78,6 @@ PriorityQueue pull(PriorityQueue);
 char *unitPrefix(float*);
 
 // tree.c
-int leavesTree(Tree);
 Tree createTree(Data);
 Tree createOverTree(Tree, Tree);
 void freeTree(Tree);

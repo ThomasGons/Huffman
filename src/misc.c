@@ -15,8 +15,8 @@ void help(){
 
 PriorityQueue push(PriorityQueue ptr, Tree pt){
     PriorityQueue elm = malloc(sizeof *elm);
-    if (!elm){ 
-        printf("The node couldn't be created, allocation failed");
+    if (!elm){
+        fprintf(stderr, "The node couldn't be created, allocation failed");
         exit(QUEUE_ALLOCATION_FAILED);
     }
     *elm = (PriorityQueueElm) {.pt = pt, .next = NULL};
