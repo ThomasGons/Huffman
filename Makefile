@@ -5,7 +5,7 @@
 # Compiler, linker and flags
 
 CC = gcc -fsanitize=address
-CFLAGS = -g -Wall -Wextra -O3
+CFLAGS = -g -Wall -Wextra -Wno-unused-result -Wno-return-local-addr -O3
 LDFLAGS = -Wall -I$(DINC) -lm
 
 # Directories
@@ -36,17 +36,17 @@ $(DOBJ)%.o: $(DSRC)%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 	@echo "Successful compilation !"
 
-.PHONY: clean cleanS cleanC
-
-cleanC:
-	@rm -f $(DCONFIG)*.huf $(DCONFIG)*.huf.dcm
-	@echo "Compressed and decompressed files removed."
+.PHONY: clean clean_s clean_pf
 
 clean:
 	@rm -rf $(DOBJ) $(DBIN)
 	@echo "Clean up project directories"
 
-cleanS:
+clean_pf:
+	@rm -f $(DCONFIG)*.huf $(DCONFIG)*.dcm
+	@echo "Compressed and decompressed files removed."
+
+clean_s:
 	@rm -f $(OBJ) $(EXE)
 	@echo "Objects and executable removed"
 
@@ -56,6 +56,6 @@ help:
 	@echo -e "\t\x1b[1mUSAGE\x1b[0m"
 	@echo -e "\t\tmake [RULE]\n"
 	@echo -e "\t\x1b[1mLIST OF RULES\n"	
-	@echo -e "\t\t\x1b[1mcleanC\x1b[0m\tremove all compressed files."
-	@echo -e "\t\t\x1b[1mclean\x1b[0m\tremove object and binary directories with their content." 
-	@echo -e "\t\t\x1b[1mcleanS\x1b[0m\tonly remove content of objects and binary directories.\n"
+	@echo -e "\t\t\x1b[1mclean\x1b[0m\tremove object and binary directories with their content." 	
+	@echo -e "\t\t\x1b[1mclean_pf\x1b[0m\tremove all processed files in config/ directory."
+	@echo -e "\t\t\x1b[1mclean_s\x1b[0m\tonly remove content of objects and binary directories.\n"

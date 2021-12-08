@@ -11,8 +11,11 @@
 
 #define CHAR_MAX 256
 
+// get the fields value of an "over tree"
 #define DATA_SUM(a, b) (Data) {'\0', a.occur + b.occur, 0, 0}
+// retrieve the value of the p-th bit of a bit sequence
 #define BIT_EXTRACTION(n, p) (1 & ((n) >> (p)))
+// give the best prefix unit for data size
 #define UNIT_PREFIX(n) ((n) >= 1000) ? \
                        ((n) >= 1000000) ? \
                        ((n) >= 1000000000) ? \
@@ -21,6 +24,8 @@
                        (Prefix) {(n) / 1000, "kb"} : \
                        (Prefix) {(n), "bits"}
 
+
+// important error codes
 
 #define BAD_ARGUMENTS -1
 #define FILE_DOES_NOT_EXIST -2
@@ -50,7 +55,6 @@ typedef struct PriorityQueueElm{
     struct PriorityQueueElm *next;
 }PriorityQueueElm, *PriorityQueue;
 
-
 typedef struct Prefix{
     float n;
     char* prf;
@@ -59,7 +63,6 @@ typedef struct Prefix{
             /* PROTOTYPES */
 
 // huff.c
-char *removeExt(char*);
 void compression(char*);
 void decompression(char*);
 PriorityQueue findCharFile(char*, Data*, uint8_t*);
@@ -75,7 +78,7 @@ void help();
 Data *insertionSort(Data*);
 PriorityQueue push(PriorityQueue, Tree);
 PriorityQueue pull(PriorityQueue);
-char *unitPrefix(float*);
+void removeExt(char*);
 
 // tree.c
 Tree createTree(Data);

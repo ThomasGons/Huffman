@@ -1,7 +1,7 @@
 # Huffman Coding
 
 This project is an implementation of the [Huffman Coding](https://brilliant.org/wiki/huffman-encoding/).
-It allows you to lossless compress ASCII text files, until 20 to 90 percents.
+It allows you to lossless compress ASCII text files, from 20 to 90 percents.
 
 ## Table of Contents
 
