@@ -38,16 +38,16 @@ void compression(char *file){
 }
 
 PriorityQueue findCharFile(char *file, Data *dict, uint8_t *nb_char){
-    for (uint16_t i = 0; i < CHAR_MAX; i++)
-        dict[i].value = (char) i;
-    short c;
+    unsigned char c;
     FILE *f = fopen(file, "r");
     if (!f){
         fprintf(stderr, "It seems that the file '%s' does not exist", file);
         exit(FILE_DOES_NOT_EXIST);
     }
-    while ((c = getc(f)) != EOF)
+    while (fread(&c, sizeof(unsigned char), 1, f)){
+        dict[c].value = c;
         dict[c].occur++;
+    }
     fclose(f);
     PriorityQueue dictQueue = NULL;
     for (int i = 0; i < CHAR_MAX; i++, dict++){
@@ -66,6 +66,7 @@ Tree buildHuffmanTree(PriorityQueue ptrQ){
     }
     Tree tmp = ptrQ->pt;
     free(ptrQ);
+    ptrQ = NULL;
     return tmp;
 }
 
@@ -75,13 +76,13 @@ void getCharEncoding(Tree pt, Data *dict, unsigned encode, uint8_t size){
             dict[(int) pt->data.value].encoding = encode; dict[(int) pt->data.value].size_encoding = size;
         }
         getCharEncoding(pt->left, dict, encode << 1, size + 1);
-        getCharEncoding(pt->right, dict, (encode << 1) | 1, size + 1);
+        getCharEncoding(pt->right, dict, (encode << 1) + 1, size + 1);
     }
 }
 
 void makeCompressFile(Data *dict, char *file, uint8_t *nb_char){
-    int8_t c = 0, buff_size = 0;
-    unsigned buffer = 0, binary = 0;
+    unsigned char c = 0;
+    unsigned buffer = 0, buffer_size = 0, binary = 0;
     float sizeO = 0, sizeC = 0;
     FILE *f = fopen(file,"r+"), *cf = fopen(strcat(file, ".huf"), "wb");
     fwrite(nb_char, sizeof(uint8_t), 1, cf);
@@ -91,20 +92,20 @@ void makeCompressFile(Data *dict, char *file, uint8_t *nb_char){
             fwrite(&dict[i].occur, sizeof(unsigned), 1, cf);
         }
     }
-    while((c = getc(f)) != EOF){
+    while(fread(&c, sizeof(unsigned char), 1, f)){
         sizeO += 8;
         buffer <<= dict[c].size_encoding;
         buffer |= dict[c].encoding;
-        buff_size += dict[c].size_encoding;
-        while(buff_size >= 8){
-            buff_size -= 8;
-            binary = buffer >> buff_size;
+        buffer_size += dict[c].size_encoding;
+        while(buffer_size >= 8){
+            buffer_size -= 8;
+            binary = buffer >> buffer_size;
             fwrite(&binary, 1, 1, cf);
             sizeC += 8;
         }
     }
-    if (buff_size){
-        buffer <<= (8 - buff_size);
+    if (buffer_size){
+        buffer <<= (7 - buffer_size);
         binary = buffer >> 8;
         fwrite(&binary, 1, 1, cf) ;
     }
@@ -143,7 +144,8 @@ void getDictionary(FILE *file, Data *dict, uint8_t size){
 
 void makeDecompressFile(FILE *file, Tree t, char *n_file){
     FILE *df = fopen(strcat(n_file, ".dcm"), "w+");
-    uint8_t buffer_size = 0, c; int8_t i;
+    uint8_t buffer_size = 0; int8_t i;
+    unsigned char c = 0;
     unsigned buffer = 0, nb_char = t->data.occur;
     Tree tmp = t;
     while (fread(&c, sizeof(uint8_t), 1, file) == 1){
@@ -154,7 +156,7 @@ void makeDecompressFile(FILE *file, Tree t, char *n_file){
             if (BIT_EXTRACTION(buffer, i)) tmp = tmp->right;
             else tmp = tmp->left;
             if (!tmp->right && !tmp->left){
-                fprintf(df, "%c", tmp->data.value);
+                fwrite(&tmp->data.value, sizeof(unsigned char), 1, df);
                 buffer_size = i; 
                 nb_char--;
                 tmp = t;

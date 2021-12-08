@@ -32,9 +32,9 @@ PriorityQueue push(PriorityQueue ptr, Tree pt){
 }
 
 PriorityQueue pull(PriorityQueue ptr){
-    if (!ptr || !ptr->next) return NULL;
+    if (!ptr) return NULL;
     PriorityQueue tmp = ptr->next;
-    //freeTree(ptr->pt);
     free(ptr);
+    ptr = NULL;
     return tmp; 
 }

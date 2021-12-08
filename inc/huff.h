@@ -11,7 +11,7 @@
 
 #define CHAR_MAX 256
 
-#define DATA_SUM(a, b) (Data) {'0', a.occur + b.occur, 0, 0}
+#define DATA_SUM(a, b) (Data) {'\0', a.occur + b.occur, 0, 0}
 #define BIT_EXTRACTION(n, p) (1 & ((n) >> (p)))
 #define UNIT_PREFIX(n) ((n) >= 1000) ? \
                        ((n) >= 1000000) ? \
