@@ -5,7 +5,7 @@
 # Compiler, linker and flags
 
 CC = gcc -fsanitize=address
-CFLAGS = -g -Wall -Wextra -Wno-unused-result -Wno-return-local-addr -O3
+CFLAGS = -g -O3 -l -Wall -Wextra -Wno-unused-result -Wno-return-local-addr
 LDFLAGS = -Wall -I$(DINC) -lm
 
 # Directories
@@ -56,6 +56,6 @@ help:
 	@echo -e "\t\x1b[1mUSAGE\x1b[0m"
 	@echo -e "\t\tmake [RULE]\n"
 	@echo -e "\t\x1b[1mLIST OF RULES\n"	
-	@echo -e "\t\t\x1b[1mclean\x1b[0m\tremove object and binary directories with their content." 	
-	@echo -e "\t\t\x1b[1mclean_pf\x1b[0m\tremove all processed files in config/ directory."
-	@echo -e "\t\t\x1b[1mclean_s\x1b[0m\tonly remove content of objects and binary directories.\n"
+	@echo -e "\t\t\x1b[1mclean\x1b[0m	   remove object and binary directories with their content.\n" 	
+	@echo -e "\t\t\x1b[1mclean_s\x1b[0m    only remove content of objects and binary directories.\n"
+	@echo -e "\t\t\x1b[1mclean_pf\x1b[0m   remove all processed files in config/ directory."

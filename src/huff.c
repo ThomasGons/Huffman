@@ -13,15 +13,19 @@ int main(int argc, char **argv){
             compression(argv[argc - 1]);
         else if (!strcmp(argv[opt], "-d"))
             decompression(argv[argc - 1]);
+        else if (!strcmp(argv[opt], "-dr")){
+            decompression(argv[argc - 1]);
+            removeCompressFile(argv[argc - 1]);
+        }
         else if (!strcmp(argv[opt], "-h") || !strcmp(argv[opt], "--help"))
             help();
         else
-            printf("Bad option.\nTry './bin/exe -h <file>' or './bin/exe --help <file>' for more information.\n");
+            fprintf(stderr, "Bad option.\nTry './bin/exe -h <file>' or './bin/exe --help <file>' for more information.\n");
     }
     /* With no option, the file is compressed and decompressed.
      But to execute './bin/exe -h' or './bin/exe --help' is allowed and it displays help message. */
     if (opt == 1){
-        if (strcmp(argv[opt], "-h") || strcmp(argv[opt], "--help"))
+        if (!strcmp(argv[opt], "-h") || !strcmp(argv[opt], "--help"))
             help();
         else{
             compression(argv[argc - 1]);
@@ -31,7 +35,7 @@ int main(int argc, char **argv){
     return EXIT_SUCCESS;
 }
 
-void compression(char *file){
+void compression(char *filename){
     // Useful to get the execution time.
     clock_t begin = clock();
     // Pointer for the number of different characters in the file to avoid complications in the returns.
@@ -40,22 +44,22 @@ void compression(char *file){
     Data dict[CHAR_MAX] = {{0}, {0}, {0}, {0}};
     /* As we get all the characters and their occurrences in the dictionary,
     we can build the Huffman tree of the file and that even more easily with a priority queue. */
-    Tree huffTree = buildHuffmanTree(findCharFile(file, dict, nb_char));
+    Tree huffTree = buildHuffmanTree(findCharFile(dict, filename, nb_char));
     // With the huffman tree we can get the encoding of the character by going through the tree.
     getCharEncoding(huffTree, dict, 0, 0);
     freeTree(huffTree);
     // Finally, we can compress the file.
-    makeCompressFile(dict, file, nb_char);
+    makeCompressFile(dict, filename, nb_char);
 	free(nb_char);
     clock_t end = clock();
     printf("\nCompression completed in %ld ms\n", (end - begin) * 1000 / CLOCKS_PER_SEC);
 }
 
-PriorityQueue findCharFile(char *file, Data *dict, uint8_t *nb_char){
+PriorityQueue findCharFile(Data *dict, char* filename, uint8_t *nb_char){
     unsigned char c;
-    FILE *f = fopen(file, "r");
+    FILE *f = fopen(filename, "r");
     if (!f){
-        fprintf(stderr, "It seems that the file '%s' does not exist", file);
+        fprintf(stderr, "It seems that the file '%s' does not exist", basename(filename));
         exit(FILE_DOES_NOT_EXIST);
     }
     // Full reading of the original file to get chars and especially their occurrences.
@@ -106,20 +110,20 @@ void getCharEncoding(Tree pt, Data *dict, unsigned encode, uint8_t size){
     }
 }
 
-void makeCompressFile(Data *dict, char *file, uint8_t *nb_char){
+void makeCompressFile(Data *dict, char *filename, uint8_t *nb_char){
     unsigned char c = 0;
     unsigned buffer = 0, buffer_size = 0, binary = 0;
     // These sizes are just useful to get the size of original and compressed file.
     double sizeO = 0, sizeC = 0;
-    FILE *f = fopen(file,"r+");
+    FILE *f = fopen(filename,"r+");
     // Removing of the extension of the file to append .huf extension.
-    removeExt(file);
-    FILE *cf = fopen(strcat(file, ".huf"), "wb");
+    removeExt(filename);
+    FILE *cf = fopen(strcat(filename, ".huf"), "wb");
     // Writing of the number of different char, the characters and their occurrences in the header of the compressed file.
     fwrite(nb_char, sizeof(uint8_t), 1, cf);
     for (uint16_t i = 0; i < CHAR_MAX; i++){
         if (dict[i].occur){
-            fwrite(&dict[i].value, sizeof(char), 1, cf);
+            fwrite(&dict[i].value, sizeof(unsigned char), 1, cf);
             fwrite(&dict[i].occur, sizeof(unsigned), 1, cf);
         }
     }
@@ -156,9 +160,20 @@ void makeCompressFile(Data *dict, char *file, uint8_t *nb_char){
     fclose(f); fclose(cf);
 }
 
-void decompression(char *file){
+void decompression(char *filename){
     clock_t begin = clock();
-    FILE *f = fopen(file, "rb");
+    char* tmp = malloc(sizeof *tmp * 5);
+    memcpy(tmp, &filename[strlen(filename) - 4], 5);
+    if (strcmp(".huf", tmp)){
+        fprintf(stderr, "the compressed file must have '.huf' extension to be decompressed.\n");
+        exit(BAD_CMP_FILE_EXTENSION);
+    }
+    free(tmp);
+    FILE *f = fopen(filename, "rb");
+    if (!f){
+        fprintf(stderr, "It seems that the file '%s' does not exist", basename(filename));
+        exit(FILE_DOES_NOT_EXIST);
+    }
     uint8_t size;
     // Retrieving of the different characters' number.
     fread(&size, sizeof(uint8_t), 1, f);
@@ -172,12 +187,11 @@ void decompression(char *file){
     }
     Tree huffTree = buildHuffmanTree(dictQueue);
     // Now decompression can be done.
-    makeDecompressFile(f, huffTree, file);
+    makeDecompressFile(f, huffTree, filename);
     freeTree(huffTree);
     fclose(f);
     clock_t end = clock();
     printf("Decompression completed in %ld ms\n", (end - begin) * 1000 / CLOCKS_PER_SEC);
-
 }
 
 void getDictionary(FILE *file, Data *dict, uint8_t size){
@@ -188,10 +202,10 @@ void getDictionary(FILE *file, Data *dict, uint8_t size){
     }
 }
 
-void makeDecompressFile(FILE *file, Tree t, char *n_file){ 
+void makeDecompressFile(FILE *file, Tree t, char *filename){ 
     // Removing of the file's extension to append later .dcm extension in the name of decompressed file.
-    removeExt(n_file);
-    FILE *df = fopen(strcat(n_file, ".dcm"), "w+");
+    removeExt(filename);
+    FILE *df = fopen(strcat(filename, ".dcm"), "w+");
     uint8_t buffer_size = 0; int8_t i;
     unsigned char c = 0;
     // The total number of characters in the original file is represented by nb_char.
@@ -224,4 +238,13 @@ void makeDecompressFile(FILE *file, Tree t, char *n_file){
         tmp = t;
     }
     fclose(df);
+}
+
+void removeCompressFile(char *filename){
+    removeExt(filename);
+    strcat(filename, ".huf");
+    if (!remove(filename))
+        fprintf(stdout, "'%s' removed successfully.\n", basename(filename));
+    else
+        fprintf(stderr, "%s could not be deleted.\n", basename(filename));
 }

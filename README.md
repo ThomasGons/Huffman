@@ -1,13 +1,17 @@
 # Huffman Coding
 
-This project is an implementation of the [Huffman Coding](https://brilliant.org/wiki/huffman-encoding/).
-It allows you to lossless compress ASCII text files, from 20 to 90 percents.
+
+![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://badgen.net/badge/status/completed/green)
+
+This project is an implementation of the [Huffman Coding](https://brilliant.org/wiki/huffman-encoding/).</br>
+It allows you to lossless compress all text files, from 20 to 90 percents.<br></br>
 
 ## Table of Contents
 
 - [Install](#install)
 - [Usage](#usage)
 
+<br>
 
 ## Install 
 
@@ -24,9 +28,9 @@ or
 ```bash
 git clone git@github.com:Tucobad/Huffman.git  # with ssh protocol
 ```
+<br>
 
 ## Usage
-
 
 The structure of the project is convenient, thus you can easily find your way. </br>
 By default, there are some samples in `config/` directory (50kb to 2mb).

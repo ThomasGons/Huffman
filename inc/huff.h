@@ -6,6 +6,7 @@
 #include <time.h>
 #include <string.h>
 #include <inttypes.h>
+#include <libgen.h>
 
             /* CONSTANTS AND MACROS */
 
@@ -29,8 +30,9 @@
 
 #define BAD_ARGUMENTS -1
 #define FILE_DOES_NOT_EXIST -2
-#define TREE_ALLOCATION_FAILED -3
-#define QUEUE_ALLOCATION_FAILED -4
+#define BAD_CMP_FILE_EXTENSION -3
+#define TREE_ALLOCATION_FAILED -4
+#define QUEUE_ALLOCATION_FAILED -5
 
             /* STRUCTURES */ 
 
@@ -65,13 +67,14 @@ typedef struct Prefix{
 // huff.c
 void compression(char*);
 void decompression(char*);
-PriorityQueue findCharFile(char*, Data*, uint8_t*);
+PriorityQueue findCharFile(Data*, char*, uint8_t*);
 Tree buildHuffmanTree(PriorityQueue);
 void getCharEncoding(Tree, Data*, unsigned, uint8_t);
 void makeCompressFile(Data*, char*, uint8_t*);
 void decoampression(char*);
 void getDictionary(FILE*, Data*, uint8_t);
 void makeDecompressFile(FILE*, Tree, char*);
+void removeCompressFile(char*);
 
 // misc.c
 void help();
